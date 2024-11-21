@@ -1,0 +1,48 @@
+// https://aka.ms/devcontainer.json
+{
+	"name": "OpenAI RAG",
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+	"service": "laravel",
+	"workspaceFolder": "/var/www/html",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"DEVSENSE.phptools-vscode",
+				"mikestead.dotenv",
+				"codingyu.laravel-goto-view",
+				"naoray.laravel-goto-components",
+				"sanderronde.phpstan-vscode",
+				"calebporzio.better-phpunit",
+				"eamodio.gitlens",
+				"shevaua.phpcs",
+				"austenc.vscode-laravel-docs"
+			],
+			"settings": {
+				"files.autoSave": "onFocusChange",
+				"files.defaultLanguage": "markdown",
+				"files.encoding": "utf8",
+				"files.eol": "\n",
+				"files.insertFinalNewline": true,
+				"files.trimFinalNewlines": true,
+				"files.trimTrailingWhitespace": true,
+				"phpcs.showSources": true,
+				"laravel-pint.enable": true,
+				"editor.formatOnSave": true,
+				"php.validate.enable": false,
+				"php.suggest.basic": false,
+				"[blade]": {
+					"editor.autoClosingBrackets": "always",
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	},
+	"remoteUser": "sail",
+	"postCreateCommand": "chown -R $WWWUSER:$WWWGROUP /var/www/html",
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/home/sail/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.gitconfig,target=/home/sail/.gitconfig,type=bind,consistency=cached"
+	]
+}
