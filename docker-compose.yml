@@ -1,7 +1,7 @@
 services:
     laravel:
         build:
-            context: './vendor/laravel/sail/runtimes/8.3'
+            context: './docker/8.3'
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
@@ -29,8 +29,6 @@ services:
             - redis
     mariadb:
         image: 'mariadb:11'
-        ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'
