@@ -66,4 +66,10 @@ class File extends Model
         }
         return null;
     }
+
+    public function delete()
+    {
+        OpenAI::vectorStores()->files()->delete(env('OPENAI_VECTOR_STORE_ID'), $this->id);
+        OpenAI::files()->delete($this->id);
+    }
 }
