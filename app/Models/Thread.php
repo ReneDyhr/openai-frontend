@@ -30,7 +30,7 @@ class Thread extends Model
             ],
         ]);
 
-        $thread = new Thread([
+        $thread = new self([
             'id' => $thread->threadId,
             'created_at' => $thread->createdAt,
             'instructions' => $thread->instructions,
