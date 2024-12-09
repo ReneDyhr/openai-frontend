@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Cache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OpenAI\Laravel\Facades\OpenAI;
 
@@ -25,17 +26,30 @@ class File extends Model
 
     public static function getFiles()
     {
-        $allVectorFiles = [];
-        $limit = 100;
+        $cacheVectorKey = 'openai_vector_files';
 
-        $vectorFiles = OpenAI::vectorStores()->files()->list(env('OPENAI_VECTOR_STORE_ID'), ['limit' => $limit]);
-        $allVectorFiles = array_merge($allVectorFiles, $vectorFiles->data);
-        do {
-            $vectorFiles = OpenAI::vectorStores()->files()->list(env('OPENAI_VECTOR_STORE_ID'), ['limit' => $limit, 'after' => $vectorFiles->lastId]);
+        $allVectorFiles = Cache::remember($cacheVectorKey, env('CACHE_TTL', 600), function () {
+            $allVectorFiles = [];
+            $limit = 100;
+
+            $vectorFiles = OpenAI::vectorStores()->files()->list(env('OPENAI_VECTOR_STORE_ID'), ['limit' => $limit]);
+            /**
+             * @var array<id: string, object: string, created_at: int, bytes: ?int, filename: string, purpose: string, status: string, status_details: array<array-key, mixed>|string|null> $allVectorFiles
+             */
             $allVectorFiles = array_merge($allVectorFiles, $vectorFiles->data);
-        } while ($vectorFiles->hasMore);
+            do {
+                $vectorFiles = OpenAI::vectorStores()->files()->list(env('OPENAI_VECTOR_STORE_ID'), ['limit' => $limit, 'after' => $vectorFiles->lastId]);
+                $allVectorFiles = array_merge($allVectorFiles, $vectorFiles->data);
+            } while ($vectorFiles->hasMore);
 
-        $files = OpenAI::files()->list();
+            return $allVectorFiles;
+        });
+
+        $cacheKey = 'openai_files';
+        $files = Cache::remember($cacheKey, env('CACHE_TTL', 600), function () {
+            return OpenAI::files()->list();
+        });
+
         $models = [];
         foreach ($vectorFiles->data as $vectorFile) {
             foreach ($files->data as $file) {
