@@ -51,7 +51,7 @@ class File extends Model
         });
 
         $models = [];
-        foreach ($vectorFiles->data as $vectorFile) {
+        foreach ($allVectorFiles as $vectorFile) {
             foreach ($files->data as $file) {
                 if ($vectorFile->id === $file->id) {
                     $models[] = new File([
