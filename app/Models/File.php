@@ -54,7 +54,7 @@ class File extends Model
         foreach ($allVectorFiles as $vectorFile) {
             foreach ($files->data as $file) {
                 if ($vectorFile->id === $file->id) {
-                    $models[] = new File([
+                    $models[] = new self([
                         'id' => $file->id,
                         'bytes' => $file->bytes,
                         'created_at' => $file->createdAt,
