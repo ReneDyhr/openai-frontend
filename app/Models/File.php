@@ -75,7 +75,19 @@ class File extends Model
         $files = self::getFiles();
         foreach ($files as $file) {
             if ($file->filename === $filename) {
-                return $file;
+                return new self([
+                    'id' => $file->id,
+                    'bytes' => $file->bytes,
+                    'created_at' => $file->created_at,
+                    'filename' => $file->filename,
+                    'status' => $file->status,
+                    'vector_status' => $file->vector_status,
+                    'vector_last_error' => $file->vector_last_error,
+                ]);
+            }
+        }
+        return null;
+    }
             }
         }
         return null;
