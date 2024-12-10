@@ -111,6 +111,12 @@ class File extends Model
     public function delete()
     {
         OpenAI::vectorStores()->files()->delete(env('OPENAI_VECTOR_STORE_ID'), $this->id);
-        OpenAI::files()->delete($this->id);
+        $file = OpenAI::files()->delete($this->id);
+
+        Cache::delete('openai_files');
+        Cache::delete('openai_vector_files');
+
+        return $file;
+    }
     }
 }
