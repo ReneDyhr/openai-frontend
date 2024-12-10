@@ -118,5 +118,40 @@ class File extends Model
 
         return $file;
     }
+
+    public static function create(string $filePath, bool $overwrite = false)
+    {
+        $filename = basename($filePath);
+
+        $check = self::findFile($filename);
+        if ($check && !$overwrite) {
+            throw new \Exception('File already exists');
+        } elseif ($check && $overwrite) {
+            $check->delete();
+        }
+        $file = OpenAI::files()->upload([
+            'purpose' => 'assistants',
+            'file' => fopen($filePath, 'r'),
+        ]);
+
+        OpenAI::vectorStores()->files()->create(env('OPENAI_VECTOR_STORE_ID'), ['file_id' => $file->id]);
+
+        do {
+            $vectorFile = OpenAI::vectorStores()->files()->retrieve(env('OPENAI_VECTOR_STORE_ID'), $file->id);
+            sleep(5);
+        } while ($vectorFile->status !== 'completed');
+
+        Cache::delete('openai_files');
+        Cache::delete('openai_vector_files');
+
+        return new self([
+            'id' => $file->id,
+            'bytes' => $file->bytes,
+            'created_at' => $file->createdAt,
+            'filename' => $file->filename,
+            'status' => $file->status,
+            'vector_status' => 'processed',
+            'vector_last_error' => null,
+        ]);
     }
 }
