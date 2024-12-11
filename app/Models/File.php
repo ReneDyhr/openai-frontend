@@ -119,7 +119,7 @@ class File extends Model
         return $file;
     }
 
-    public static function create(string $filePath, bool $overwrite = false)
+    public static function create(string $filePath, bool $overwrite = true)
     {
         $filename = basename($filePath);
 
