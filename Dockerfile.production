@@ -1,0 +1,47 @@
+FROM php:8.3-apache
+
+ARG PHP_EXTS="bcmath ctype fileinfo mbstring pdo pdo_mysql intl dom pcntl zip gd sodium"
+
+ARG PHP_EXTS
+
+RUN apt update \
+    && apt install -y libonig-dev libicu-dev libsodium-dev libxml2-dev libzip-dev zip libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev cron curl supervisor \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && docker-php-ext-install -j$(nproc) ${PHP_EXTS} \
+    && a2enmod rewrite \
+    && apt purge -y --auto-remove libonig-dev libxml2-dev
+
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+COPY --from=node:slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:slim /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+
+RUN apt update \
+    && apt install -y zip unzip git \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY docker/production/supervisor.conf /etc/supervisor/conf.d/worker.conf
+
+WORKDIR /var/www/html/
+
+COPY --chown=www-data:www-data . /var/www/html/
+
+RUN touch laravel.cron && \
+    echo "* * * * * cd /var/www/html/ && /usr/local/bin/php artisan schedule:run" >> laravel.cron && \
+    crontab laravel.cron
+
+RUN /usr/local/bin/composer install --no-interaction --optimize-autoloader --no-dev \
+    && /usr/local/lib/node_modules/npm/bin/npm-cli.js install \
+    && /usr/local/lib/node_modules/npm/bin/npm-cli.js run build
+
+RUN chown -R www-data:www-data /var/www/html/
+
+USER www-data
+
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/worker.conf"]
