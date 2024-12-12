@@ -1,0 +1,1 @@
+const SearchURL = 'http://localhost';
