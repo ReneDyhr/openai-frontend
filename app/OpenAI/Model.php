@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\OpenAI;
 use ArrayAccess;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

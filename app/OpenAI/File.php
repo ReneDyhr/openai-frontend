@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\OpenAI;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Cache;
@@ -9,7 +9,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 /**
  * @property string $id
- * @property string $bytes
+ * @property ?int $bytes
  * @property string $created_at
  * @property string $filename
  * @property string $status
