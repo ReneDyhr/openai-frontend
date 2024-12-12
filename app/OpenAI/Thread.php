@@ -111,7 +111,7 @@ class Thread extends Model
 
     public function save()
     {
-        \App\Models\Thread::create([
+        $thread = \App\Models\Thread::create([
             'id' => $this->id,
             'instructions' => $this->instructions,
             'created_at' => $this->created_at,
@@ -129,6 +129,6 @@ class Thread extends Model
             ]);
         }
 
-        return $this;
+        return $thread->load('messages');
     }
 }

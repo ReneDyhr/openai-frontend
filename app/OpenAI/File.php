@@ -119,10 +119,8 @@ class File extends Model
         return $file;
     }
 
-    public static function create(string $filePath, bool $overwrite = true)
+    public static function create(string $filename, string $filePath, bool $overwrite = true)
     {
-        $filename = basename($filePath);
-
         $check = self::findFile($filename);
         if ($check && !$overwrite) {
             throw new \Exception('File already exists');

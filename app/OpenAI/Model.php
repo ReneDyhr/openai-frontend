@@ -173,5 +173,9 @@ abstract class Model implements ArrayAccess, JsonSerializable
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
+    public function toArray(): array
+    {
+        return $this->attributes;
+    }
 
 }
