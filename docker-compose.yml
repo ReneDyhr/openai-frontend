@@ -24,8 +24,6 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
-        depends_on:
-            - mariadb
             - redis
     redis:
         image: 'redis:alpine'
